@@ -48,12 +48,26 @@ def find_min_total_cost(edge_functions, optimized_player_edges):
     
     return min_total_cost
 
-def enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions):
+"""def enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions):
     # Generate all possible allocations of players to edges
     edge_allocations_with_cost = []
     for allocation in itertools.product(range(num_edges), repeat=num_players):
         total_cost = calculate_final_total_cost(allocation, edge_functions)
         edge_allocations_with_cost.append((allocation, total_cost))
+    return edge_allocations_with_cost"""
+
+def enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions):
+    edge_allocations_with_cost = []
+    
+    # Generate all possible allocations of players to edges
+    edge_allocations = itertools.combinations_with_replacement(range(num_edges), num_players)
+    
+    # Check each allocation for total cost
+    for allocation in edge_allocations:
+        sorted_allocation = tuple(sorted(allocation))
+        total_cost = calculate_total_player_cost_pure_nash_equilibrium(sorted_allocation, edge_functions)
+        edge_allocations_with_cost.append((sorted_allocation, total_cost))
+    
     return edge_allocations_with_cost
 
 def choose_minimum_total_cost_allocation(edge_allocations_with_cost):
@@ -122,6 +136,8 @@ def find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
             pure_nash_equilibria.append(sorted_allocation)
             total_cost = calculate_total_player_cost_pure_nash_equilibrium(sorted_allocation, edge_functions)
             total_costs.append(total_cost)
+            #we add an exta break cause all n_e have the same cost so we will not find them. in another case remove the break
+            break
     
     return pure_nash_equilibria, total_costs
 
@@ -129,30 +145,32 @@ def calculate_total_player_cost_pure_nash_equilibrium(allocation, edge_functions
     total_cost = calculate_final_total_cost(allocation, edge_functions)
     return total_cost
 
-"""def find_PoA(k,m):
-    num_players = k
-    num_edges = m
+def find_PoA():
+    num_players = random.randint(2,10)
+    num_edges = random.randint(2,8) 
     edge_functions = generate_edge_functions(num_edges)
     player_edges, edge_players = assign_edges_to_players_arbitrary(num_players, num_edges)
     edge_allocations_with_cost = enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions)
     min_cost_allocation, min_total_cost = choose_minimum_total_cost_allocation(edge_allocations_with_cost)
     pure_nash_equilibria, total_costs = find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
-    return total_costs[0]/min_total_cost"""
+    #print("the PNE is ",pure_nash_equilibria[0])
+    #print("the min cost allocation is ",min_cost_allocation)
+    if min_total_cost==0: #in the rare case where a=0 and b=0 
+        return 0
+    return total_costs[0]/min_total_cost
 
 max_PoA= 0
-"""
-for n in range(2):
-    k=random.randint(2,10)
-    m=random.randint(2,8)
-    PoA=find_PoA(k,m)
+
+for i in range(10000):
+    PoA=find_PoA()
     print("now the PoA is: ",PoA)
     if PoA>max_PoA:
         max_PoA=PoA
 
-print("worst PoA (and PoS) is: ",max_PoA)"""
+print("worst PoA (and PoS) is: ",max_PoA)
 
-for k in range(100):
-    
+"""
+for i in range(10000):
 
     num_players = random.randint(2,10)
     num_edges = random.randint(2,8)
@@ -170,8 +188,8 @@ for k in range(100):
     #print("Minimum Total Cost:", min_total_cost)
 
     pure_nash_equilibria, total_costs = find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
-    #print("Pure Nash Equilibria:", pure_nash_equilibria[0])
-    #print("Total Player Costs:", total_costs[0])
+    #print("Pure Nash Equilibria:", pure_nash_equilibria)
+    #print("Total Player Costs:", total_costs)
 
     # we see that all the pure nash equilibria have the same cost so we just need to choose one to divide it with the optimal cost
     # we will choose the first one without loss off generality
@@ -182,4 +200,4 @@ for k in range(100):
         max_PoA=PoA
     print("Price of arachy is: ",PoA)
 
-print("worst PoA is ",max_PoA)
+print("worst PoA is ",max_PoA)"""

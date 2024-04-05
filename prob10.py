@@ -16,7 +16,7 @@ def generate_edge_functions(num_edges):
         edge_functions.append((a, b))
     return edge_functions
 
-""" initial optimal allocation (different problem)
+""" initial optimal allocation (this is to optimize the first allocation but it is not according to the statement of the problem)
 def assign_edges_to_players(num_players, num_edges, edge_functions):
     player_edges = [None] * num_players  # Initialize list to store player-edge associations
     edge_players = [[] for _ in range(num_edges)]  # Initialize list to store players for each edge
@@ -146,14 +146,13 @@ for k in range(2,11):
                     break
                 optimized_player_edges = new_player_edges
                 
-
             # Print the optimized allocations
             final_totalcost=0
             for player_id, edge_id in enumerate(optimized_player_edges):
                 cost = calculate_player_cost(player_id, edge_functions, optimized_player_edges)
                 #print(f"Player {player_id+1} assigned to Edge {edge_id+1} with cost {cost}")
                 final_totalcost+=cost
-
+    
             """
             print("-------->final player-edge allocation: ", player_edges)
             print("Initial cost was: ",initial_cost," and final cost was: ",final_totalcost)
