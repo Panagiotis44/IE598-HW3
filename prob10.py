@@ -114,7 +114,7 @@ def optimize_allocation(player_edges, edge_functions):
 
 for k in range(2,11):
     for m in range(2,9):
-        n=1000
+        n=10000
         total_count=0
         for it in range(n):
             #num_players = generate_players()
@@ -161,7 +161,7 @@ for k in range(2,11):
             #print("number of changes in allocation: ",count)
 
             total_count+=count
-        print("for k=",k," and m=",m," , the average changes out of 1000 is: ",total_count/1000)
+        print("for k=",k," and m=",m," , the average changes out of 1000 is: ",total_count/10000)
 
 #print("avg runs to converge to sol: ",total_count/n)
 

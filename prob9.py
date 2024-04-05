@@ -22,27 +22,6 @@ def calculate_player_cost(player_id, edge_functions, player_edges):
     cost = edge_function[0] * num_players_on_edge + edge_function[1]
     return round(cost, 3)  # Round the cost to 3 decimals
 
-"""def optimize_allocation(player_edges, edge_functions):
-    num_players = len(player_edges)
-    num_edges = len(edge_functions)
-    changed = True
-    while changed:
-        changed = False
-        for player_id in range(num_players):
-            current_cost = calculate_player_cost(player_id, edge_functions, player_edges)
-            best_cost = current_cost
-            best_edge_id = player_edges[player_id]
-            for new_edge_id in range(num_edges):
-                if new_edge_id != best_edge_id:      
-                    new_cost = calculate_player_cost(player_id, edge_functions, [new_edge_id if i == player_id else e for i, e in enumerate(player_edges)])
-                    if new_cost < best_cost:
-                        best_cost = new_cost
-                        best_edge_id = new_edge_id
-            if best_edge_id != player_edges[player_id]:
-                player_edges[player_id] = best_edge_id
-                changed = True
-    return player_edges"""
-
 def generate_edge_functions(num_edges):
     edge_functions = []
     for i in range(num_edges):
@@ -85,7 +64,7 @@ def choose_minimum_total_cost_allocation(edge_allocations_with_cost):
             min_total_cost = total_cost
             min_cost_allocation = allocation
     return min_cost_allocation, min_total_cost
-
+"""
 def find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions):
     pure_nash_equilibria = []
     total_costs = []
@@ -115,70 +94,92 @@ def find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
     
     return pure_nash_equilibria, total_costs
 
+"""
+def find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions):
+    pure_nash_equilibria = []
+    total_costs = []
+    
+    # Generate all possible allocations of players to edges
+    edge_allocations = itertools.combinations_with_replacement(range(num_edges), num_players)
+    
+    # Check each allocation for Nash equilibrium
+    for allocation in edge_allocations:
+        sorted_allocation = tuple(sorted(allocation))
+        is_nash_equilibrium = True
+        for player_id in range(num_players):
+            current_cost = calculate_player_cost(player_id, edge_functions, sorted_allocation)
+            for new_edge_id in range(num_edges):
+                if new_edge_id != sorted_allocation[player_id]:
+                    new_allocation = list(sorted_allocation)
+                    new_allocation[player_id] = new_edge_id
+                    new_cost = calculate_player_cost(player_id, edge_functions, tuple(new_allocation))
+                    if new_cost < current_cost:
+                        is_nash_equilibrium = False
+                        break
+            if not is_nash_equilibrium:
+                break
+        if is_nash_equilibrium:
+            pure_nash_equilibria.append(sorted_allocation)
+            total_cost = calculate_total_player_cost_pure_nash_equilibrium(sorted_allocation, edge_functions)
+            total_costs.append(total_cost)
+    
+    return pure_nash_equilibria, total_costs
 
 def calculate_total_player_cost_pure_nash_equilibrium(allocation, edge_functions):
     total_cost = calculate_final_total_cost(allocation, edge_functions)
     return total_cost
 
-k=6
-m=4
-num_players = k
-num_edges = m
+"""def find_PoA(k,m):
+    num_players = k
+    num_edges = m
+    edge_functions = generate_edge_functions(num_edges)
+    player_edges, edge_players = assign_edges_to_players_arbitrary(num_players, num_edges)
+    edge_allocations_with_cost = enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions)
+    min_cost_allocation, min_total_cost = choose_minimum_total_cost_allocation(edge_allocations_with_cost)
+    pure_nash_equilibria, total_costs = find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
+    return total_costs[0]/min_total_cost"""
 
-edge_functions = generate_edge_functions(num_edges)
-
-player_edges, edge_players = assign_edges_to_players_arbitrary(num_players, num_edges)
+max_PoA= 0
 """
-optimized_player_edges = optimize_allocation(player_edges, edge_functions)
+for n in range(2):
+    k=random.randint(2,10)
+    m=random.randint(2,8)
+    PoA=find_PoA(k,m)
+    print("now the PoA is: ",PoA)
+    if PoA>max_PoA:
+        max_PoA=PoA
 
-while True:
-    new_player_edges = optimize_allocation(optimized_player_edges, edge_functions)
-    if new_player_edges == optimized_player_edges:
-        break
-    optimized_player_edges = new_player_edges
+print("worst PoA (and PoS) is: ",max_PoA)"""
 
-optimal_cost=0
-for player_id, edge_id in enumerate(optimized_player_edges):
-    cost = calculate_player_cost(player_id, edge_functions, optimized_player_edges)
-    #print(f"Player {player_id+1} assigned to Edge {edge_id+1} with cost {cost}")
-    optimal_cost+=cost
-"""
-print("players number is",num_players,"edges number is ",num_edges)
-print(edge_functions)
-"""
-optimized_player_edges = optimize_allocation(player_edges, edge_functions)
-            
-while True:
-    new_player_edges = optimize_allocation(optimized_player_edges, edge_functions)
-    if new_player_edges == optimized_player_edges:
-        break
-    optimized_player_edges = new_player_edges
-                
-"""
-"""            
-final_totalcost=0
-for player_id, edge_id in enumerate(optimized_player_edges):
-    cost = calculate_player_cost(player_id, edge_functions, optimized_player_edges)
-    print(f"Player {player_id+1} assigned to Edge {edge_id+1} with cost {cost}")
-    final_totalcost+=cost        
-print("the final totalcost is ",final_totalcost)
-"""
+for k in range(100):
+    
 
-"""min_total_cost = find_min_total_cost(edge_functions, optimized_player_edges)
-print("Minimum Total Cost:", min_total_cost)"""
+    num_players = random.randint(2,10)
+    num_edges = random.randint(2,8)
 
-edge_allocations_with_cost = enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions)
-min_cost_allocation, min_total_cost = choose_minimum_total_cost_allocation(edge_allocations_with_cost)
-print("Minimum Total Cost Allocation:", min_cost_allocation)
-print("Minimum Total Cost:", min_total_cost)
+    edge_functions = generate_edge_functions(num_edges)
 
-pure_nash_equilibria, total_costs = find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
-print("Pure Nash Equilibria:", pure_nash_equilibria[0])
-print("Total Player Costs:", total_costs[0])
+    player_edges, edge_players = assign_edges_to_players_arbitrary(num_players, num_edges)
 
-# we see that all the pure nash equilibria have the same cost so we just need to choose one to divide it with the optimal cost
-# we will choose the first one without loss off generality
-#PoA=Pos
+    #print("players number is",num_players,"edges number is ",num_edges)
+    #print(edge_functions)
 
-PoA=total_costs[0]/min_total_cost
-print("Price off arachy is: ",PoA)
+    edge_allocations_with_cost = enumerate_edge_allocations_with_cost(num_players, num_edges, edge_functions)
+    min_cost_allocation, min_total_cost = choose_minimum_total_cost_allocation(edge_allocations_with_cost)
+    #print("Minimum Total Cost Allocation:", min_cost_allocation)
+    #print("Minimum Total Cost:", min_total_cost)
+
+    pure_nash_equilibria, total_costs = find_pure_nash_equilibria_with_costs(num_players, num_edges, edge_functions)
+    #print("Pure Nash Equilibria:", pure_nash_equilibria[0])
+    #print("Total Player Costs:", total_costs[0])
+
+    # we see that all the pure nash equilibria have the same cost so we just need to choose one to divide it with the optimal cost
+    # we will choose the first one without loss off generality
+    #PoA=Pos
+
+    PoA=total_costs[0]/min_total_cost
+    if PoA>max_PoA:
+        max_PoA=PoA
+    print("Price of arachy is: ",PoA)
+
+print("worst PoA is ",max_PoA)
